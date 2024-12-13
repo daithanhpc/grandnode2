@@ -10,4 +10,7 @@ public class OrderStatusModel : BaseEntityModel
 
     [GrandResourceDisplayName("Admin.Orders.OrderStatus.Fields.DisplayOrder")]
     public int DisplayOrder { get; set; }
+
+    [GrandResourceDisplayName("Admin.Orders.OrderStatus.Fields.AllowSplitOrder")]
+    public bool AllowSplitOrder { get; set; }
 }
