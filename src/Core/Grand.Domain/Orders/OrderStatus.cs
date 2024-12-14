@@ -6,4 +6,5 @@ public class OrderStatus : BaseEntity
     public string Name { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsSystem { get; set; }
+    public bool AllowSplitOrder { get; set; }
 }

@@ -7,6 +7,7 @@ using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Grand.Domain.Directory;
 
 namespace Grand.Web.Admin.Controllers;
 
@@ -92,6 +93,16 @@ public class OrderStatusController : BaseAdminController
 
         return new JsonResult("");
     }
+    [HttpPost]
+    [PermissionAuthorizeAction(PermissionActionName.Edit)]
+    public async Task<IActionResult> MarkAsAllowSplitOrder(string id)
+    {
+        var status = await _orderStatusService.GetById(id);
+        status.AllowSplitOrder = !status.AllowSplitOrder;
+        await _orderStatusService.Update(status);
 
+
+        return Json(new { result = true });
+    }
     #endregion
 }

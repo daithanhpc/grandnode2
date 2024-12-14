@@ -1,0 +1,132 @@
+﻿<div class="panel panel-default">
+    <div class="note note-info">
+        <p>
+            <h4>@Loc["Admin.Settings.Order.OrderStatus"]</h4>
+        </p>
+    </div>
+    <div class="panel-body">       
+            <div id="orderstatus-grid"></div>   
+    </div>   
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#orderstatus-grid").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "@Html.Raw(Url.Action("Statuses", "OrderStatus", new { area = Constants.AreaAdmin }))",
+                        type: "POST",
+                        dataType: "json",
+                        data: addAntiForgeryToken
+                    },
+                    create: {
+                        url: "@Html.Raw(Url.Action("Add", "OrderStatus", new { area = Constants.AreaAdmin }))",
+                        type: "POST",
+                        dataType: "json",
+                        data: addAntiForgeryToken
+                    },
+                    update: {
+                        url: "@Html.Raw(Url.Action("Update", "OrderStatus", new { area = Constants.AreaAdmin }))",
+                        type: "POST",
+                        dataType: "json",
+                        data: addAntiForgeryToken
+                    },
+                    destroy: {
+                        url: "@Html.Raw(Url.Action("Delete", "OrderStatus", new { area = Constants.AreaAdmin }))",
+                        type: "POST",
+                        dataType: "json",
+                        data: addAntiForgeryToken
+                    },
+                    parameterMap: function (data, operation) {
+                        if (operation != "read") {
+                            return data;
+                        } else {
+                            return data;
+                        }
+                    }
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        id: "Id",
+                        fields: {
+                            Name: { editable: true, type: "string" },
+                            DisplayOrder: { editable: true, type: "number" },
+                            Id: { editable: false, type: "string" }
+                        }
+                    }
+                },
+                requestEnd: function(e) {
+                    if (e.type == "create" || e.type == "update") {
+                        this.read();
+                    }
+                },
+                error: function(e) {
+                    display_kendoui_grid_error(e);
+                    // Cancel the changes
+                    this.cancelChanges();
+                },
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+            },
+            pageable: {
+                refresh: true,
+                numeric: false,
+                previousNext: false,
+                info: false
+            },
+            toolbar: [{ name: "create", text: "@Loc["Admin.Common.AddNewRecord"]" }],
+            editable: {
+                confirmation: false,
+                mode: "inline"
+            },
+            scrollable: false,
+            columns: [
+                {
+                    field: "Name",
+                    title: "@Loc["Admin.Orders.OrderStatus.Fields.Name"]",
+                    width: 300
+                }, {
+                    field: "DisplayOrder",
+                    title: "@Loc["Admin.Orders.OrderStatus.Fields.DisplayOrder"]",
+                    //integer format
+                    format: "{0:0}",
+                    width: 100
+                },{
+                    field: "Id",
+                    title: "@Loc["Admin.Orders.OrderStatus.Fields.AllowSplitOrder"]",
+                    template: '<a onclick="markAsAllowSplitOrder(\'#=Id#\')" class="k-button"> # if(AllowSplitOrder) {# <i class="fa fa-check" aria-hidden="true" style="color:green;margin-right:5px;"></i> #} else {# <i class="fa fa-times" aria-hidden="true" style="color:red;margin-right:5px;"></i> #} # @Loc["Admin.Orders.OrderStatus.Fields.AllowSplitOrder"]</a>'
+                }
+            ]
+        });
+    });
+
+  
+</script>
+<script>
+      function markAsAllowSplitOrder(id) {
+        if (confirm('@Loc["Admin.Common.AreYouSure"]')) {
+            var postData = {
+                id: id
+            };
+            addAntiForgeryToken(postData);
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("MarkAsAllowSplitOrder", "OrderStatus", new { area = Constants.AreaAdmin }))",
+                data: postData,
+            success: function(data) {
+                var grid = $("#orderstatus-grid").data('kendoGrid');
+                grid.dataSource.read();
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert('Failed to update Order Status');
+            }
+        });
+    }
+      }
+
+</script>
